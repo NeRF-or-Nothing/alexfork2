@@ -71,6 +71,12 @@ class CameraPoseVisualizer:
     def plot_cam(self, cam, color="blue"):
         self.ax.scatter(cam[0],cam[1],cam[2], color= color)
 
+    def plot_ray(self, translation):
+        ##self.ax.scatter(translation[0], translation[1], translation[2], color="gray")
+        x = np.linspace(translation[0], 0, 10)
+        y = np.linspace(translation[1], 0, 10)
+        z = np.linspace(translation[2], 0, 10)
+        self.ax.plot(x, y, z, color="gray")
 
     def show(self):
         print("Displaying Data")
@@ -108,6 +114,7 @@ if __name__ =='__main__':
             secondary_point = np.asarray([0,0,-3,1])
             visualizer.plot_cam(e @ secondary_point, color)
 
+            visualizer.plot_ray(t)
 
         cams.append(c)
     visualizer.show()
