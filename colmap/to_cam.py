@@ -71,11 +71,16 @@ class CameraPoseVisualizer:
     def plot_cam(self, cam, color="blue"):
         self.ax.scatter(cam[0],cam[1],cam[2], color= color)
 
-    def plot_ray(self, translation):
-        ##self.ax.scatter(translation[0], translation[1], translation[2], color="gray")
-        x = np.linspace(translation[0], 0, 10)
-        y = np.linspace(translation[1], 0, 10)
-        z = np.linspace(translation[2], 0, 10)
+    def plot_ray(self, translation, origin=np.array([0,0,0])):
+        ## self.ax.scatter(translation[0], translation[1], translation[2], color="gray")
+        ## finding the "origin"
+
+        ## given an origin in camera space:
+        ## 
+
+        x = np.linspace(translation[0], origin[0], 10)
+        y = np.linspace(translation[1], origin[1], 10)
+        z = np.linspace(translation[2], origin[2], 10)
         self.ax.plot(x, y, z, color="gray")
 
     def show(self):
@@ -91,6 +96,10 @@ if __name__ =='__main__':
     input = json.loads(input_str.read())
 
     extrins = []
+    intrins = np.array(input["intrinsic_matrix"])
+    ## should be given x,y somewhere
+    x = 0
+    y = 0
     for f in input["frames"]:
         extrinsic = np.array(f["extrinsic_matrix"])
         extrins+=[ extrinsic ]
@@ -106,6 +115,7 @@ if __name__ =='__main__':
             r = e[0:3,0:3]
             t = e[0:3,3]
             c = -r.T @ t
+
             print("Rotation:\n",r)
             print("Translation:\n",t)
             print("Cam:\n",c)
@@ -114,8 +124,11 @@ if __name__ =='__main__':
             secondary_point = np.asarray([0,0,-3,1])
             visualizer.plot_cam(e @ secondary_point, color)
 
-            visualizer.plot_ray(t)
-
+            ## turn 2d camera coordinates into 3d world coordinates
+            ## given an x,y
+            product = np.array([x,y,1]) @ intrins @ e
+            
+            visualizer.plot_ray(t, product)
         cams.append(c)
     visualizer.show()
 
