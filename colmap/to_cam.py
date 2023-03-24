@@ -98,8 +98,8 @@ if __name__ =='__main__':
     extrins = []
     intrins = np.array(input["intrinsic_matrix"])
     ## should be given x,y somewhere
-    x = 0
-    y = 0
+    x = 2
+    y = 2
     for f in input["frames"]:
         extrinsic = np.array(f["extrinsic_matrix"])
         extrins+=[ extrinsic ]
@@ -126,7 +126,9 @@ if __name__ =='__main__':
 
             ## turn 2d camera coordinates into 3d world coordinates
             ## given an x,y
-            product = np.array([x,y,1]) @ intrins @ e
+            twodinput = np.array([x,y,1])
+            print(twodinput.shape)
+            product = twodinput @ (intrins @ e[0:3, 0:4])
             
             visualizer.plot_ray(t, product)
         cams.append(c)
