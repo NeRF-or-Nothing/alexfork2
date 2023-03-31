@@ -97,9 +97,6 @@ if __name__ =='__main__':
 
     extrins = []
     intrins = np.array(input["intrinsic_matrix"])
-    ## should be given x,y somewhere
-    x = 2
-    y = 2
     for f in input["frames"]:
         extrinsic = np.array(f["extrinsic_matrix"])
         extrins+=[ extrinsic ]
@@ -107,7 +104,7 @@ if __name__ =='__main__':
     visualizer = CameraPoseVisualizer([-5, 5], [-5, 5], [0, 5])
     cams = []
     for i,e in enumerate(extrins):
-        if i%3 == 0:
+        if ((i)%3 == 0):
             color = plt.cm.rainbow(i / len(extrins))
             visualizer.extrinsic2pyramid(e, color)
             primary_point = np.asarray([0,0,-2,1])
@@ -126,12 +123,34 @@ if __name__ =='__main__':
 
             ## turn 2d camera coordinates into 3d world coordinates
             ## given an x,y
-            twodinput = np.array([x,y,1])
-            print(twodinput.shape)
+            '''
+            if (i == 3 or i == 12 or i == 27 or i == 45 or i == 63 or i == 81):
+                if (i == 3):
+                  x = 347
+                  y = 147
+                elif (i == 12):
+                  x = 358
+                  y = 157
+                elif (i == 27):
+                  x = 338
+                  y = 153
+                elif (i == 45):
+                  x = 316
+                  y = 149
+                elif (i == 63):
+                  x = 391
+                  y = 141
+                else:
+                  x = 329
+                  y = 149
+                twodinput = np.array([x,y,1])
+                product = twodinput @ (intrins @ e[0:3, 0:4])
+                visualizer.plot_ray(t, product)
+            '''
+            twodinput = np.array([400,400,1])
             product = twodinput @ (intrins @ e[0:3, 0:4])
-            
             visualizer.plot_ray(t, product)
-        cams.append(c)
+            cams.append(c)
     visualizer.show()
 
 
