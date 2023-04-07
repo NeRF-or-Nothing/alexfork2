@@ -6,6 +6,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from numpy.linalg import inv
 
 class CameraPoseVisualizer:
     def __init__(self, xlim, ylim, zlim):
@@ -71,12 +72,14 @@ class CameraPoseVisualizer:
     def plot_cam(self, cam, color="blue"):
         self.ax.scatter(cam[0],cam[1],cam[2], color= color)
 
-    def plot_ray(self, translation, origin=np.array([0,0,0])):
+    def plot_ray(self, translation, origin=np.array([0.25,0.25,0])):
         ## self.ax.scatter(translation[0], translation[1], translation[2], color="gray")
         ## finding the "origin"
 
         ## given an origin in camera space:
         ## 
+        print("translation: (x,y,z) = ", translation[0], translation[1], translation[2])
+        print("origin: (x,y,z) = ", origin[0], origin[1], origin[2])
 
         x = np.linspace(translation[0], origin[0], 10)
         y = np.linspace(translation[1], origin[1], 10)
@@ -90,6 +93,7 @@ class CameraPoseVisualizer:
 
 if __name__ =='__main__':
     print("Starting conversion")
+    
     input_file = sys.argv[1]
 
     input_str = open(input_file)
@@ -103,6 +107,7 @@ if __name__ =='__main__':
 
     visualizer = CameraPoseVisualizer([-5, 5], [-5, 5], [0, 5])
     cams = []
+
     for i,e in enumerate(extrins):
         if ((i)%3 == 0):
             color = plt.cm.rainbow(i / len(extrins))
@@ -122,33 +127,13 @@ if __name__ =='__main__':
             visualizer.plot_cam(e @ secondary_point, color)
 
             ## turn 2d camera coordinates into 3d world coordinates
-            ## given an x,y
-            '''
-            if (i == 3 or i == 12 or i == 27 or i == 45 or i == 63 or i == 81):
-                if (i == 3):
-                  x = 347
-                  y = 147
-                elif (i == 12):
-                  x = 358
-                  y = 157
-                elif (i == 27):
-                  x = 338
-                  y = 153
-                elif (i == 45):
-                  x = 316
-                  y = 149
-                elif (i == 63):
-                  x = 391
-                  y = 141
-                else:
-                  x = 329
-                  y = 149
-                twodinput = np.array([x,y,1])
-                product = twodinput @ (intrins @ e[0:3, 0:4])
-                visualizer.plot_ray(t, product)
-            '''
-            twodinput = np.array([400,400,1])
-            product = twodinput @ (intrins @ e[0:3, 0:4])
+            ## given an x,y           
+            ## math:
+            ## Vc = I @ E @ Vw
+            ## Thus, Vw = (E @ I)^T @ Vc
+            twodinput = np.array([[400],[400],[1]])
+            oneVector = np.array([[0],[0],[1]])
+            product = np.transpose(inv(e)) @ np.transpose(np.concatenate((intrins,oneVector), axis=1)) @ twodinput
             visualizer.plot_ray(t, product)
             cams.append(c)
     visualizer.show()
