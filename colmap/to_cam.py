@@ -130,10 +130,15 @@ if __name__ =='__main__':
             ## given an x,y           
             ## math:
             ## Vc = I @ E @ Vw
-            ## Thus, Vw = (E @ I)^T @ Vc
+            ## Thus, Vw = (E @ I)^(-1) @ Vc
+            ##oneVector = np.array([[0],[0],[0],[1]])
+            invRotations = inv(r)
+            translationVector = np.array([[t[0]],[t[1]],[t[2]]])
+            extrinsicWithInvR = np.concatenate((invRotations,translationVector), axis=1)
             twodinput = np.array([[400],[400],[1]])
-            oneVector = np.array([[0],[0],[1]])
-            product = np.transpose(inv(e)) @ np.transpose(np.concatenate((intrins,oneVector), axis=1)) @ twodinput
+            ##fourbythreeIntrins = np.transpose(np.concatenate((intrins,oneVector), axis=1))
+            print(extrinsicWithInvR.shape)
+            product = np.transpose(extrinsicWithInvR) @ inv(intrins) @ twodinput
             visualizer.plot_ray(t, product)
             cams.append(c)
     visualizer.show()
