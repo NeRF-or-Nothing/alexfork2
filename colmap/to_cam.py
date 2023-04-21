@@ -107,7 +107,7 @@ if __name__ =='__main__':
 
     visualizer = CameraPoseVisualizer([-5, 5], [-5, 5], [0, 5])
     cams = []
-
+    centers = []
     for i,e in enumerate(extrins):
         if ((i)%3 == 0):
             color = plt.cm.rainbow(i / len(extrins))
@@ -140,7 +140,21 @@ if __name__ =='__main__':
             print(extrinsicWithInvR.shape)
             product = np.transpose(extrinsicWithInvR) @ inv(intrins) @ twodinput
             visualizer.plot_ray(t, product)
+            centers.append(product)
             cams.append(c)
+    
+    centerX = 0
+    centerY = 0
+    centerZ = 0
+    for i in range(len(centers)):
+        centerX += centers[i][0]
+        centerY += centers[i][1]
+        centerZ += centers[i][2]
+    centerX = centerX / len(centers)
+    centerY = centerY / len(centers)
+    centerZ = centerZ / len(centers)
+    print("CENTER AVERAGE:")
+    print("x = ", centerX, " y = ", centerY, "z = ", centerZ)
     visualizer.show()
 
 
